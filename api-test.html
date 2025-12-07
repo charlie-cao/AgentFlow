@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentFlow API 测试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 AgentFlow API 测试工具</h1>
+            <p>测试后端 API 和功能完整性</p>
+            <span id="server-status" class="status-badge">检测中...</span>
+        </div>
+
+        <div class="content">
+            <!-- 系统状态检查 -->
+            <div class="test-section">
+                <h3>📊 系统状态</h3>
+                <button class="btn btn-primary" onclick="checkSystemStatus()">检查系统状态</button>
+                <div id="system-status-result" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- 认证测试 -->
+            <div class="test-section">
+                <h3>🔐 用户认证测试</h3>
+                <div class="two-column">
+                    <div>
+                        <h4>注册新用户</h4>
+                        <div class="form-group">
+                            <label>用户名:</label>
+                            <input type="text" id="reg-username" value="test_user_123">
+                        </div>
+                        <div class="form-group">
+                            <label>邮箱:</label>
+                            <input type="email" id="reg-email" value="test123@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>密码:</label>
+                            <input type="password" id="reg-password" value="test123456">
+                        </div>
+                        <button class="btn btn-success" onclick="testRegister()">注册用户</button>
+                        <div id="register-result" class="result" style="display: none;"></div>
+                    </div>
+
+                    <div>
+                        <h4>用户登录</h4>
+                        <div class="form-group">
+                            <label>邮箱:</label>
+                            <input type="email" id="login-email" value="test123@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>密码:</label>
+                            <input type="password" id="login-password" value="test123456">
+                        </div>
+                        <button class="btn btn-primary" onclick="testLogin()">登录</button>
+                        <div id="login-result" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ollama API 测试 -->
+            <div class="test-section">
+                <h3>🤖 Ollama API 测试</h3>
+                <div class="two-column">
+                    <div>
+                        <h4>获取模型列表</h4>
+                        <button class="btn btn-primary" onclick="testOllamaModels()">获取模型列表</button>
+                        <div id="models-result" class="result" style="display: none;"></div>
+                    </div>
+
+                    <div>
+                        <h4>文本生成测试</h4>
+                        <div class="form-group">
+                            <label>提示词:</label>
+                            <textarea id="generate-prompt" placeholder="输入提示词...">你好，请用一句话介绍一下你自己。</textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="testOllamaGenerate()">生成文本</button>
+                        <div id="generate-result" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSE 测试 -->
+            <div class="test-section">
+                <h3>📡 实时通信测试</h3>
+                <button class="btn btn-warning" onclick="testSSE()">测试 SSE 连接</button>
+                <button class="btn btn-danger" onclick="stopSSE()">停止 SSE</button>
+                <div id="sse-result" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- 快速测试套件 -->
+            <div class="test-section">
+                <h3>⚡ 完整测试套件</h3>
+                <p>运行完整的 API 测试序列：</p>
+                <button class="btn btn-primary" onclick="runFullTestSuite()">🚀 运行完整测试</button>
+                <div id="suite-result" class="result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        let currentToken = null;
+        let sseEventSource = null;
+
+        // 页面加载时检查系统状态
+        window.onload = function() {
+            checkSystemStatus();
+        };
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(currentToken && { 'Authorization': `Bearer ${currentToken}` }),
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                const data = await response.json();
+
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+
+        function showResult(elementId, result, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(result, null, 2);
+        }
+
+        function showInfo(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result info';
+            element.textContent = message;
+        }
+
+        // 检查系统状态
+        async function checkSystemStatus() {
+            const statusBadge = document.getElementById('server-status');
+            statusBadge.textContent = '检测中...';
+            statusBadge.className = 'status-badge';
+
+            const checks = [
+                { name: '后端服务器', url: '/health' },
+                { name: 'Ollama服务', url: 'http://localhost:11434/api/tags' }
+            ];
+
+            let results = [];
+
+            for (const check of checks) {
+                try {
+                    const response = await fetch(check.url);
+                    results.push(`${check.name}: ✅ ${response.ok ? '正常' : '异常'} (${response.status})`);
+                } catch (error) {
+                    results.push(`${check.name}: ❌ 连接失败 - ${error.message}`);
+                }
+            }
+
+            const allOnline = results.every(r => r.includes('✅'));
+            statusBadge.textContent = allOnline ? '🟢 所有服务在线' : '🔴 部分服务离线';
+            statusBadge.className = `status-badge ${allOnline ? 'status-online' : 'status-offline'}`;
+
+            showInfo('system-status-result', results.join('\n'));
+        }
+
+        // 注册测试
+        async function testRegister() {
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            showInfo('register-result', '正在注册...');
+
+            const result = await makeRequest(`${API_BASE}/api/auth/register`, {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+            });
+
+            if (result.ok) {
+                currentToken = result.data.data.token;
+                showResult('register-result', {
+                    success: true,
+                    message: '注册成功！',
+                    user: result.data.data.user,
+                    token: currentToken.substring(0, 50) + '...'
+                }, true);
+            } else {
+                showResult('register-result', {
+                    success: false,
+                    error: result.data?.error || result.error
+                }, false);
+            }
+        }
+
+        // 登录测试
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            showInfo('login-result', '正在登录...');
+
+            const result = await makeRequest(`${API_BASE}/api/auth/login`, {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+
+            if (result.ok) {
+                currentToken = result.data.data.token;
+                showResult('login-result', {
+                    success: true,
+                    message: '登录成功！',
+                    user: result.data.data.user,
+                    token: currentToken.substring(0, 50) + '...'
+                }, true);
+            } else {
+                showResult('login-result', {
+                    success: false,
+                    error: result.data?.error || result.error
+                }, false);
+            }
+        }
+
+        // 获取 Ollama 模型列表
+        async function testOllamaModels() {
+            if (!currentToken) {
+                showResult('models-result', { error: '请先登录或注册获取 token' }, false);
+                return;
+            }
+
+            showInfo('models-result', '获取模型列表中...');
+
+            const result = await makeRequest(`${API_BASE}/api/ollama/models`);
+
+            if (result.ok) {
+                const models = result.data.data.models;
+                const qwen3Model = models.find(m => m.name.includes('qwen3'));
+
+                showResult('models-result', {
+                    success: true,
+                    totalModels: models.length,
+                    qwen3Available: !!qwen3Model,
+                    models: models.map(m => ({
+                        name: m.name,
+                        size: (m.size / 1024 / 1024 / 1024).toFixed(2) + ' GB'
+                    }))
+                }, true);
+            } else {
+                showResult('models-result', {
+                    success: false,
+                    error: result.data?.error || result.error
+                }, false);
+            }
+        }
+
+        // Ollama 文本生成
+        async function testOllamaGenerate() {
+            if (!currentToken) {
+                showResult('generate-result', { error: '请先登录或注册获取 token' }, false);
+                return;
+            }
+
+            const prompt = document.getElementById('generate-prompt').value;
+            if (!prompt) {
+                showResult('generate-result', { error: '请输入提示词' }, false);
+                return;
+            }
+
+            showInfo('generate-result', '生成文本中...');
+
+            const result = await makeRequest(`${API_BASE}/api/ollama/generate`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    model: 'qwen3:latest',
+                    prompt: prompt,
+                    temperature: 0.7,
+                    max_tokens: 200
+                })
+            });
+
+            if (result.ok) {
+                showResult('generate-result', {
+                    success: true,
+                    model: result.data.data.model,
+                    response: result.data.data.response,
+                    eval_count: result.data.data.eval_count,
+                    total_duration: result.data.data.total_duration + 'ms'
+                }, true);
+            } else {
+                showResult('generate-result', {
+                    success: false,
+                    error: result.data?.error || result.error
+                }, false);
+            }
+        }
+
+        // SSE 测试
+        function testSSE() {
+            stopSSE(); // 先停止之前的连接
+
+            const userId = 'test_user_' + Date.now();
+            const eventSource = new EventSource(`${API_BASE}/api/sse?userId=${userId}`);
+
+            sseEventSource = eventSource;
+
+            showInfo('sse-result', 'SSE 连接已建立，等待数据...\n');
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const element = document.getElementById('sse-result');
+                element.style.display = 'block';
+                element.className = 'result success';
+                element.textContent += `收到数据: ${JSON.stringify(data, null, 2)}\n`;
+            };
+
+            eventSource.onerror = function(event) {
+                showResult('sse-result', { error: 'SSE 连接错误' }, false);
+            };
+
+            setTimeout(() => {
+                if (sseEventSource) {
+                    showInfo('sse-result', 'SSE 测试完成（5秒后自动停止）');
+                }
+            }, 5000);
+        }
+
+        function stopSSE() {
+            if (sseEventSource) {
+                sseEventSource.close();
+                sseEventSource = null;
+                showInfo('sse-result', 'SSE 连接已停止');
+            }
+        }
+
+        // 完整测试套件
+        async function runFullTestSuite() {
+            const results = [];
+
+            showInfo('suite-result', '🚀 开始完整测试套件...\n');
+
+            // 1. 系统状态检查
+            results.push('=== 系统状态检查 ===');
+            try {
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                results.push(`后端服务器: ${healthResponse.ok ? '✅ 正常' : '❌ 异常'}`);
+            } catch (error) {
+                results.push(`后端服务器: ❌ ${error.message}`);
+            }
+
+            // 2. 注册测试用户
+            results.push('\n=== 用户注册测试 ===');
+            const testUser = {
+                username: 'suite_user_' + Date.now(),
+                email: 'suite' + Date.now() + '@test.com',
+                password: 'test123456'
+            };
+
+            const regResult = await makeRequest(`${API_BASE}/api/auth/register`, {
+                method: 'POST',
+                body: JSON.stringify(testUser)
+            });
+
+            if (regResult.ok) {
+                currentToken = regResult.data.data.token;
+                results.push('✅ 用户注册成功');
+            } else {
+                results.push(`❌ 用户注册失败: ${regResult.data?.error?.message || regResult.error}`);
+                showResult('suite-result', results.join('\n'), false);
+                return;
+            }
+
+            // 3. Ollama 模型测试
+            results.push('\n=== Ollama 模型测试 ===');
+            const modelsResult = await makeRequest(`${API_BASE}/api/ollama/models`);
+
+            if (modelsResult.ok) {
+                const models = modelsResult.data.data.models;
+                const hasQwen3 = models.some(m => m.name.includes('qwen3'));
+                results.push(`✅ 模型列表获取成功 (${models.length} 个模型)`);
+                results.push(`✅ qwen3 模型: ${hasQwen3 ? '可用' : '未找到'}`);
+            } else {
+                results.push(`❌ 模型列表获取失败: ${modelsResult.data?.error?.message || modelsResult.error}`);
+            }
+
+            // 4. 文本生成测试
+            results.push('\n=== 文本生成测试 ===');
+            const genResult = await makeRequest(`${API_BASE}/api/ollama/generate`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    model: 'qwen3:latest',
+                    prompt: '你好，请简单介绍一下自己。',
+                    temperature: 0.7
+                })
+            });
+
+            if (genResult.ok) {
+                results.push('✅ 文本生成成功');
+                results.push(`生成内容: ${genResult.data.data.response.substring(0, 100)}...`);
+            } else {
+                results.push(`❌ 文本生成失败: ${genResult.data?.error?.message || genResult.error}`);
+            }
+
+            // 5. SSE 测试
+            results.push('\n=== SSE 连接测试 ===');
+            try {
+                const eventSource = new EventSource(`${API_BASE}/api/sse?userId=test_suite`);
+                let sseSuccess = false;
+
+                const timeout = setTimeout(() => {
+                    if (!sseSuccess) {
+                        results.push('⚠️ SSE 连接超时（可能是正常现象）');
+                    }
+                }, 3000);
+
+                eventSource.onmessage = function(event) {
+                    sseSuccess = true;
+                    clearTimeout(timeout);
+                    results.push('✅ SSE 连接成功');
+                    eventSource.close();
+                };
+
+                eventSource.onerror = function() {
+                    clearTimeout(timeout);
+                    results.push('❌ SSE 连接失败');
+                };
+            } catch (error) {
+                results.push(`❌ SSE 测试异常: ${error.message}`);
+            }
+
+            // 测试总结
+            results.push('\n=== 测试总结 ===');
+            const successCount = (results.match(/✅/g) || []).length;
+            const errorCount = (results.match(/❌/g) || []).length;
+            const warningCount = (results.match(/⚠️/g) || []).length;
+
+            results.push(`总计: ${successCount + errorCount + warningCount} 项测试`);
+            results.push(`✅ 成功: ${successCount}`);
+            results.push(`❌ 失败: ${errorCount}`);
+            results.push(`⚠️ 警告: ${warningCount}`);
+
+            const allSuccess = errorCount === 0;
+            showResult('suite-result', results.join('\n'), allSuccess);
+        }
+    </script>
+</body>
+</html>
