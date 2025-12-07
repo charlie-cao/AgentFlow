@@ -1,0 +1,51 @@
+{
+  "name": "agentflow",
+  "version": "1.0.0",
+  "description": "AI-powered multi-agent workflow platform built on Bun.js",
+  "type": "module",
+  "main": "src/server/app.ts",
+  "scripts": {
+    "dev": "bun run --watch src/server/app.ts",
+    "start": "bun run src/server/app.ts",
+    "build": "bun build src/server/app.ts --outdir=dist --target=bun",
+    "build:client": "cd client && bun run build",
+    "dev:client": "cd client && bun run dev",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/server/db/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "test": "bun test",
+    "lint": "bun run --bun eslint .",
+    "format": "bun run --bun prettier --write ."
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.1.0",
+    "@supabase/supabase-js": "^2.86.2",
+    "@types/ws": "^8.5.10",
+    "bcryptjs": "^2.4.3",
+    "bullmq": "^4.12.0",
+    "drizzle-orm": "^0.29.0",
+    "hono": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.0.4",
+    "postgres": "^3.4.0",
+    "redis": "^4.6.0",
+    "ws": "^8.16.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/bcryptjs": "^2.4.6",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "drizzle-kit": "^0.20.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0",
+    "bun-types": "latest"
+  },
+  "trustedDependencies": [
+    "@types/ws",
+    "drizzle-kit",
+    "esbuild"
+  ]
+}
